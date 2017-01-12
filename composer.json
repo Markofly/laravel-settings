@@ -1,0 +1,22 @@
+{
+    "name": "markofly/laravel-settings",
+    "description": "Larevel 5 settings",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Marko Murumaa",
+            "email": "marko.murumaa@gmail.com"
+        }
+    ],
+    "autoload" : {
+        "psr-4": {
+            "Markofly\\Settings\\": "src"
+        }
+    },
+    "require": {
+        "php": ">=5.5.0",
+        "illuminate/database": ">= 5.0",
+        "illuminate/cache": ">= 5.0",
+        "illuminate/support": ">= 5.0"
+    }
+}
