@@ -31,10 +31,14 @@ Add the facade to `config/app.php`
 ],
 ```
 
-Publish config, view and form files
+Publish config and migration files
 
 ```bash
 $ php artisan vendor:publish --provider="Markofly\Settings\SettingsServiceProvider"
+```
+
+```bash
+$ php artisan migrate
 ```
 
 ## Usage
