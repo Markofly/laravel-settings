@@ -2,6 +2,7 @@
 
 namespace Markofly\Settings;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -25,6 +26,11 @@ class Settings
      * @var array
      */
     protected $fields;
+
+    /**
+     * @var null|array
+     */
+    protected $allFields = null;
 
     /**
      * Settings constructor.
@@ -227,4 +233,73 @@ class Settings
     {
         return isset($this->config['fields']) ? $this->config['fields'] : [];
     }
+
+    /**
+     * @return array
+     */
+    protected function getConfigSettingsKeys()
+    {
+        return array_keys($this->getConfigSettingsFields());
+    }
+
+    /**
+     * @return Collection
+     */
+    protected function getDatabaseSettingsFields()
+    {
+        return $this->database->table($this->getDatabaseTableName())->get();
+    }
+
+    /**
+     * @return array
+     */
+    protected function getDatabaseSettingsKeys()
+    {
+        return $this->database->table($this->getDatabaseTableName())->select('key')->pluck('key')->toArray();
+    }
+
+    /**
+     * Get all settings from database and config
+     * @return array
+     */
+    public function getAllSettings()
+    {
+        if ($this->allFields !== null) {
+            return $this->allFields;
+        }
+
+        $configFieldsKeys = $this->getConfigSettingsKeys();
+        $databaseFieldsKeys = $this->getDatabaseSettingsKeys();
+
+        $configFiedlsNotInDatabase = array_diff($configFieldsKeys, $databaseFieldsKeys);
+
+        $configValues = $this->getConfigSettingsFields();
+        $databaseValues = $this->getDatabaseSettingsFields();
+
+        foreach ($databaseValues as $databaseValue) {
+
+            $this->allFields[$databaseValue->key] = [
+                'value' => $databaseValue->value,
+                'default' => isset($configValues[$databaseValue->key]['default']) ? $configValues[$databaseValue->key]['default'] : null,
+                'group' => [
+                    'label' => isset($configValues[$databaseValue->key]['group']['label']) ? $configValues[$databaseValue->key]['group']['label'] : 'No group',
+                    'slug' => isset($configValues[$databaseValue->key]['group']['slug']) ? $configValues[$databaseValue->key]['group']['slug'] : 'no-group',
+                ],
+            ];
+        }
+
+        foreach ($configFiedlsNotInDatabase as $item) {
+            $this->allFields[$item] = [
+                'value' => null,
+                'default' => isset($configValues[$item]['default']) ? $configValues[$item]['default'] : null,
+                'group' => [
+                    'label' => isset($configValues[$item]['group']['label']) ? $configValues[$item]['group']['label'] : 'No group',
+                    'slug' => isset($configValues[$item]['group']['slug']) ? $configValues[$item]['group']['slug'] : 'no-group',
+                ],
+            ];
+        }
+
+        return $this->allFields;
+    }
+
 }

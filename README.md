@@ -74,6 +74,26 @@ Save settings to database
 Settings::save('site_name', 'Laravel 5');
 ```
 
+Get all fields from config and database
+
+```php
+<?php
+Settings::getAllSettings();
+```
+This returns:
+```php
+ [
+  'site_name' => [
+    'value' => null             // Value stored in database
+    "default' => 'Laravel 5'    // Default value in config
+    'group' => [                // group settings in config
+      'label' => 'Site settings'
+      'slug' => 'site-settings'
+    ]
+  ]
+]
+```
+
 ## License
 
 The MIT License (MIT). Please see [License File](LICENSE) for more information.
